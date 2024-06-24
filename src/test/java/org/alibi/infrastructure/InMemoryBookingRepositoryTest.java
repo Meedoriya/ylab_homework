@@ -148,3 +148,4 @@ class InMemoryBookingRepositoryTest {
         assertThat(conflict).isFalse();
     }
 }
+

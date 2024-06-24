@@ -5,9 +5,7 @@ import lombok.Setter;
 import org.alibi.domain.model.Booking;
 import org.alibi.domain.repository.BookingRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Репозиторий для хранения бронирований в памяти.
@@ -15,8 +13,8 @@ import java.util.Optional;
 @Getter
 @Setter
 public class InMemoryBookingRepository implements BookingRepository {
-    private final List<Booking> bookings = new ArrayList<>();
-    private Long counter = 1L;
+    private final Map<Long, Booking> bookings = new HashMap<>();
+    private Long counter = 0L;
 
     /**
      * Сохраняет новое бронирование.
@@ -25,8 +23,10 @@ public class InMemoryBookingRepository implements BookingRepository {
      */
     @Override
     public void save(Booking booking) {
-        booking.setId(counter++);
-        bookings.add(booking);
+        if (booking.getId() == null) {
+            booking.setId(++counter);
+        }
+        bookings.put(booking.getId(), booking);
     }
 
     /**
@@ -37,8 +37,7 @@ public class InMemoryBookingRepository implements BookingRepository {
      */
     @Override
     public Optional<Booking> findById(Long id) {
-        return bookings.stream()
-                .filter(booking -> booking.getId().equals(id)).findFirst();
+        return Optional.ofNullable(bookings.get(id));
     }
 
     /**
@@ -48,7 +47,7 @@ public class InMemoryBookingRepository implements BookingRepository {
      */
     @Override
     public List<Booking> findAll() {
-        return new ArrayList<>(bookings);
+        return Collections.unmodifiableList(new ArrayList<>(bookings.values()));
     }
 
     /**
@@ -58,8 +57,7 @@ public class InMemoryBookingRepository implements BookingRepository {
      */
     @Override
     public void update(Booking booking) {
-        delete(booking.getId());
-        bookings.add(booking);
+        bookings.put(booking.getId(), booking);
     }
 
     /**
@@ -69,7 +67,7 @@ public class InMemoryBookingRepository implements BookingRepository {
      */
     @Override
     public void delete(Long id) {
-        bookings.removeIf(booking -> booking.getId().equals(id));
+        bookings.remove(id);
     }
 
     /**
@@ -80,10 +78,10 @@ public class InMemoryBookingRepository implements BookingRepository {
      */
     @Override
     public boolean isConflict(Booking booking) {
-        return bookings.stream().anyMatch(existingBooking ->
+        return bookings.values().stream().anyMatch(existingBooking ->
                 existingBooking.getResourceId().equals(booking.getResourceId()) &&
                         existingBooking.getEndTime().isAfter(booking.getStartTime()) &&
                         existingBooking.getStartTime().isBefore(booking.getEndTime())
-        );
+                );
     }
 }

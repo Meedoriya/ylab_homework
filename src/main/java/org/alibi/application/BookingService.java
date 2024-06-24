@@ -36,7 +36,7 @@ public class BookingService {
         List<Long> bookedWorkspaceIds = bookingRepository.findAll().stream()
                 .filter(booking -> booking.getStartTime().toLocalDate().equals(date))
                 .map(Booking::getResourceId)
-                .toList();
+                .collect(Collectors.toList());
 
         return workspaceRepository.findAll().stream()
                 .filter(workspace -> !bookedWorkspaceIds.contains(workspace.getId()))
@@ -84,7 +84,7 @@ public class BookingService {
         List<Booking> existingBookings = bookingRepository.findAll().stream()
                 .filter(booking -> booking.getResourceId().equals(resourceId))
                 .filter(booking -> booking.getEndTime().isAfter(startTime) && booking.getStartTime().isBefore(endTime))
-                .toList();
+                .collect(Collectors.toList());
 
         if (!existingBookings.isEmpty()) {
             throw new IllegalArgumentException("Booking conflict detected");
@@ -98,7 +98,6 @@ public class BookingService {
 
         bookingRepository.save(booking);
     }
-
 
     /**
      * Возвращает список всех бронирований, доступных пользователю.
