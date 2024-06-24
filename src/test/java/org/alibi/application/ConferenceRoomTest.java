@@ -5,6 +5,7 @@ import org.alibi.domain.model.Role;
 import org.alibi.domain.model.User;
 import org.alibi.domain.repository.ConferenceRoomRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,6 +31,7 @@ class ConferenceRoomServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when user is not admin")
     void addConferenceRoomShouldThrowExceptionWhenUserIsNotAdmin() {
         User user = new User();
         user.setRole(Role.valueOf("USER"));
@@ -44,6 +46,7 @@ class ConferenceRoomServiceTest {
     }
 
     @Test
+    @DisplayName("Should save conference room when user is admin")
     void addConferenceRoomShouldSaveConferenceRoomWhenUserIsAdmin() {
         User user = new User();
         user.setRole(Role.valueOf("ADMIN"));
@@ -58,6 +61,7 @@ class ConferenceRoomServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when user is not admin")
     void updateConferenceRoomShouldThrowExceptionWhenUserIsNotAdmin() {
         User user = new User();
         user.setRole(Role.valueOf("USER"));
@@ -72,6 +76,7 @@ class ConferenceRoomServiceTest {
     }
 
     @Test
+    @DisplayName("Should update conference room when user is admin")
     void updateConferenceRoomShouldUpdateConferenceRoomWhenUserIsAdmin() {
         User user = new User();
         user.setRole(Role.valueOf("ADMIN"));
@@ -86,6 +91,7 @@ class ConferenceRoomServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when user is not admin")
     void deleteConferenceRoomShouldThrowExceptionWhenUserIsNotAdmin() {
         User user = new User();
         user.setRole(Role.valueOf("USER"));
@@ -100,6 +106,7 @@ class ConferenceRoomServiceTest {
     }
 
     @Test
+    @DisplayName("Should delete conference room when user is admin")
     void deleteConferenceRoomShouldDeleteConferenceRoomWhenUserIsAdmin() {
         User user = new User();
         user.setRole(Role.valueOf("ADMIN"));

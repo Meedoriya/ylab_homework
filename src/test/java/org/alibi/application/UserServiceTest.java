@@ -4,6 +4,7 @@ import org.alibi.domain.model.Role;
 import org.alibi.domain.model.User;
 import org.alibi.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -29,6 +30,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should register user")
     void registerUserShouldRegisterUser() {
         String username = "user";
         String password = "password";
@@ -42,6 +44,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when user already exists")
     void registerUserShouldThrowExceptionWhenUserAlreadyExists() {
         String username = "user";
         String password = "password";
@@ -55,6 +58,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should return user when credentials are valid")
     void loginUserShouldReturnUserWhenCredentialsAreValid() {
         String username = "user";
         String password = "password";
@@ -70,6 +74,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when credentials are invalid")
     void loginUserShouldThrowExceptionWhenCredentialsAreInvalid() {
         String username = "user";
         String password = "password";

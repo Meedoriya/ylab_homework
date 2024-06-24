@@ -5,6 +5,7 @@ import org.alibi.domain.model.ConferenceRoom;
 import org.alibi.domain.model.Workspace;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -34,7 +35,8 @@ class ConsoleOutputTest {
     }
 
     @Test
-    void printWorkspaces_shouldPrintWorkspaceNames() {
+    @DisplayName("Should print workspace names")
+    void printWorkspacesShouldPrintWorkspaceNames() {
         Workspace workspace1 = new Workspace(1L, "Workspace 1", true);
         Workspace workspace2 = new Workspace(2L, "Workspace 2", true);
 
@@ -47,7 +49,8 @@ class ConsoleOutputTest {
     }
 
     @Test
-    void printConferenceRooms_shouldPrintConferenceRoomNames() {
+    @DisplayName("Should print conference room names")
+    void printConferenceRoomsShouldPrintConferenceRoomNames() {
         ConferenceRoom conferenceRoom1 = new ConferenceRoom(1L, "Conference Room 1", true);
         ConferenceRoom conferenceRoom2 = new ConferenceRoom(2L, "Conference Room 2", true);
 
@@ -60,7 +63,8 @@ class ConsoleOutputTest {
     }
 
     @Test
-    void printBookings_shouldPrintBookingDetails() {
+    @DisplayName("Should print booking details")
+    void printBookingsShouldPrintBookingDetails() {
         Booking booking1 = new Booking();
         booking1.setId(1L);
         booking1.setUserId(1L);

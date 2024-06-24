@@ -4,6 +4,7 @@ import org.alibi.domain.model.User;
 import org.alibi.domain.model.Workspace;
 import org.alibi.domain.repository.WorkspaceRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -27,6 +28,7 @@ class WorkspaceServiceTest {
     }
 
     @Test
+    @DisplayName("Should call repository if admin")
     void addWorkspaceShouldCallRepositoryIfAdmin() {
         User adminUser = new User();
         Workspace workspace = new Workspace();
@@ -39,6 +41,7 @@ class WorkspaceServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception if not admin")
     void addWorkspaceShouldThrowExceptionIfNotAdmin() {
         User user = new User();
         Workspace workspace = new Workspace();
@@ -51,6 +54,7 @@ class WorkspaceServiceTest {
     }
 
     @Test
+    @DisplayName("Should call repository if admin")
     void updateWorkspaceShouldCallRepositoryIfAdmin() {
         User adminUser = new User();
         Workspace workspace = new Workspace();
@@ -63,6 +67,7 @@ class WorkspaceServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception if not admin")
     void updateWorkspaceShouldThrowExceptionIfNotAdmin() {
         User user = new User();
         Workspace workspace = new Workspace();
@@ -75,6 +80,7 @@ class WorkspaceServiceTest {
     }
 
     @Test
+    @DisplayName("Should call repository if admin")
     void deleteWorkspaceShouldCallRepositoryIfAdmin() {
         User adminUser = new User();
         Long workspaceId = 1L;
@@ -87,6 +93,7 @@ class WorkspaceServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception if not admin")
     void deleteWorkspaceShouldThrowExceptionIfNotAdmin() {
         User user = new User();
         Long workspaceId = 1L;
@@ -99,6 +106,7 @@ class WorkspaceServiceTest {
     }
 
     @Test
+    @DisplayName("Should return list from repository")
     void getAllWorkspacesShouldReturnListFromRepository() {
         List<Workspace> workspaces = List.of(new Workspace(), new Workspace());
 

@@ -2,6 +2,7 @@ package org.alibi.infrastructure;
 
 import org.alibi.domain.model.Workspace;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -18,6 +19,7 @@ class InMemoryWorkspaceRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should add workspace")
     void saveShouldAddWorkspace() {
         Workspace workspace = new Workspace();
         workspace.setName("Workspace 1");
@@ -28,6 +30,7 @@ class InMemoryWorkspaceRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return workspace when exists")
     void findByIdShouldReturnWorkspaceWhenExists() {
         Workspace workspace = new Workspace();
         workspace.setName("Workspace 1");
@@ -40,6 +43,7 @@ class InMemoryWorkspaceRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return empty when not exists")
     void findByIdShouldReturnEmptyWhenNotExists() {
         Optional<Workspace> found = repository.findById(1L);
 
@@ -47,6 +51,7 @@ class InMemoryWorkspaceRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return all workspaces")
     void findAllShouldReturnAllWorkspaces() {
         Workspace workspace1 = new Workspace();
         workspace1.setName("Workspace 1");
@@ -61,6 +66,7 @@ class InMemoryWorkspaceRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return all workspace")
     void updateShouldUpdateWorkspace() {
         Workspace workspace = new Workspace();
         workspace.setName("Workspace 1");
@@ -75,6 +81,7 @@ class InMemoryWorkspaceRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should remove workspace")
     void deleteShouldRemoveWorkspace() {
         Workspace workspace = new Workspace();
         workspace.setName("Workspace 1");

@@ -8,6 +8,7 @@ import org.alibi.domain.repository.BookingRepository;
 import org.alibi.domain.repository.ConferenceRoomRepository;
 import org.alibi.domain.repository.WorkspaceRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -43,6 +44,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should return available workspaces for a given date")
     void getAvailableWorkspacesShouldReturnAvailableWorkspaces() {
         LocalDate date = LocalDate.now();
         Workspace workspace1 = new Workspace(1L, "Workspace 1", true);
@@ -59,6 +61,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should return available conference rooms for a given date")
     void getAvailableConferenceRoomsShouldReturnAvailableConferenceRooms() {
         LocalDate date = LocalDate.now();
         ConferenceRoom conferenceRoom1 = new ConferenceRoom(1L, "Conference Room 1", true);
@@ -75,6 +78,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when start time is after end time")
     void bookResourceShouldThrowExceptionWhenStartTimeAfterEndTime() {
         Long userId = 1L;
         Long resourceId = 1L;
@@ -87,6 +91,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when recourse not found")
     void bookResourceShouldThrowExceptionWhenResourceNotFound() {
         Long userId = 1L;
         Long resourceId = 1L;
@@ -101,6 +106,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when booking conflict detected")
     void bookResourceShouldThrowExceptionWhenBookingConflictDetected() {
         Long userId = 1L;
         Long resourceId = 1L;
@@ -119,6 +125,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should save booking when no conflict")
     void bookResourceShouldSaveBookingWhenNoConflict() {
         Long userId = 1L;
         Long resourceId = 1L;
@@ -133,6 +140,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should return all bookings when user is not admin")
     void getAllBookingsShouldThrowExceptionWhenUserIsNotAdmin() {
         User user = new User();
         when(authorizationService.isAdmin(user)).thenReturn(false);
@@ -143,6 +151,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should return all bookings when user is admin")
     void getAllBookingsShouldReturnAllBookingsWhenUserIsAdmin() {
         User user = new User();
         Booking booking1 = new Booking();
@@ -156,6 +165,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should return filtered bookings")
     void getFilteredBookingsShouldReturnFilteredBookings() {
         LocalDate date = LocalDate.now();
         Long userId = 1L;
@@ -172,6 +182,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should return user bookings")
     void getUserBookingsShouldReturnUserBookings() {
         User user = new User();
         user.setId(1L);
@@ -185,6 +196,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when booking not found")
     void cancelBookingShouldThrowExceptionWhenBookingNotFound() {
         User user = new User();
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -195,6 +207,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when user is not admin and not owner")
     void cancelBookingShouldThrowExceptionWhenUserIsNotAdminAndNotOwner() {
         User user = new User();
         user.setId(1L);
@@ -209,6 +222,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should delete booking when user is admin")
     void cancelBookingShouldDeleteBookingWhenUserIsAdmin() {
         User user = new User();
         Booking booking = new Booking();
@@ -221,6 +235,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should delete booking when user is owner")
     void cancelBookingShouldDeleteBookingWhenUserIsOwner() {
         User user = new User();
         user.setId(1L);
@@ -235,6 +250,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should save booking when booking workspace")
     void bookResourceShouldSaveBookingWhenBookingWorkspace() {
         Long userId = 1L;
         Long resourceId = 1L;
@@ -252,6 +268,7 @@ class BookingServiceTest {
     }
 
     @Test
+    @DisplayName("Should save booking when booking conference room")
     void bookResourceShouldSaveBookingWhenBookingConferenceRoom() {
         Long userId = 1L;
         Long resourceId = 2L;

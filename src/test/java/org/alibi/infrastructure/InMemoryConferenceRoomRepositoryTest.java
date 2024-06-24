@@ -2,6 +2,7 @@ package org.alibi.infrastructure;
 
 import org.alibi.domain.model.ConferenceRoom;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -18,6 +19,7 @@ class InMemoryConferenceRoomRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should add conference room")
     void saveShouldAddConferenceRoom() {
         ConferenceRoom conferenceRoom = new ConferenceRoom();
         conferenceRoom.setName("Conference Room 1");
@@ -28,6 +30,7 @@ class InMemoryConferenceRoomRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return conference room when exists")
     void findByIdShouldReturnConferenceRoomWhenExists() {
         ConferenceRoom conferenceRoom = new ConferenceRoom();
         conferenceRoom.setName("Conference Room 1");
@@ -40,6 +43,7 @@ class InMemoryConferenceRoomRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return empty when not exists")
     void findByIdShouldReturnEmptyWhenNotExists() {
         Optional<ConferenceRoom> found = repository.findById(1L);
 
@@ -47,6 +51,7 @@ class InMemoryConferenceRoomRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return all conference rooms")
     void findAllShouldReturnAllConferenceRooms() {
         ConferenceRoom conferenceRoom1 = new ConferenceRoom();
         conferenceRoom1.setName("Conference Room 1");
@@ -61,6 +66,7 @@ class InMemoryConferenceRoomRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should update conference room")
     void updateShouldUpdateConferenceRoom() {
         ConferenceRoom conferenceRoom = new ConferenceRoom();
         conferenceRoom.setName("Conference Room 1");
@@ -75,6 +81,7 @@ class InMemoryConferenceRoomRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should remove conference room")
     void deleteShouldRemoveConferenceRoom() {
         ConferenceRoom conferenceRoom = new ConferenceRoom();
         conferenceRoom.setName("Conference Room 1");

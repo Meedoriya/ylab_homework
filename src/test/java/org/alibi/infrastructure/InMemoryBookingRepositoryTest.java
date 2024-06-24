@@ -2,6 +2,7 @@ package org.alibi.infrastructure;
 
 import org.alibi.domain.model.Booking;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ class InMemoryBookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should add booking")
     void saveShouldAddBooking() {
         Booking booking = new Booking();
         booking.setResourceId(1L);
@@ -33,6 +35,7 @@ class InMemoryBookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return booking if exists")
     void findByIdShouldReturnBookingIfExists() {
         Booking booking = new Booking();
         booking.setResourceId(1L);
@@ -47,6 +50,7 @@ class InMemoryBookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return empty if not exists")
     void findByIdShouldReturnEmptyIfNotExists() {
         Optional<Booking> foundBooking = bookingRepository.findById(1L);
 
@@ -54,6 +58,7 @@ class InMemoryBookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return all bookings")
     void findAllShouldReturnAllBookings() {
         Booking booking1 = new Booking();
         booking1.setResourceId(1L);
@@ -74,6 +79,7 @@ class InMemoryBookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should modify existing Booking")
     void updateShouldModifyExistingBooking() {
         Booking booking = new Booking();
         booking.setResourceId(1L);
@@ -91,6 +97,7 @@ class InMemoryBookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should remove booking")
     void deleteShouldRemoveBooking() {
         Booking booking = new Booking();
         booking.setResourceId(1L);
@@ -104,6 +111,7 @@ class InMemoryBookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return true if conflict exists")
     void isConflictShouldReturnTrueIfConflictExists() {
         Booking booking1 = new Booking();
         booking1.setResourceId(1L);
@@ -122,6 +130,7 @@ class InMemoryBookingRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return false if no conflict exists")
     void isConflictShouldReturnFalseIfNoConflictExists() {
         Booking booking1 = new Booking();
         booking1.setResourceId(1L);

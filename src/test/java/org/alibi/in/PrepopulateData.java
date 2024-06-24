@@ -8,6 +8,7 @@ import org.alibi.domain.model.Role;
 import org.alibi.domain.model.User;
 import org.alibi.domain.model.Workspace;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
@@ -26,6 +27,7 @@ class PrepopulateDataTest {
     }
 
     @Test
+    @DisplayName("Should prepopulate data")
     void testPrepopulate() {
         User adminUser = new User();
         adminUser.setId(1L);

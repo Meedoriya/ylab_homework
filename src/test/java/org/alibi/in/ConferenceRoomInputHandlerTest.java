@@ -38,6 +38,7 @@ class ConferenceRoomInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should add conference room successfully")
     void testAddConferenceRoom() {
         String input = "Conference Room 1\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -54,6 +55,7 @@ class ConferenceRoomInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should update conference room successfully")
     void testUpdateConferenceRoom() {
         String input = "1\nConference Room Updated\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -70,6 +72,7 @@ class ConferenceRoomInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should delete conference room successfully")
     void testDeleteConferenceRoom() {
         String input = "1\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -86,6 +89,7 @@ class ConferenceRoomInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should view all conference rooms")
     void testViewAllConferenceRooms() {
         List<ConferenceRoom> conferenceRooms = new ArrayList<>();
         conferenceRooms.add(new ConferenceRoom(1L, "Conference Room 1", true));

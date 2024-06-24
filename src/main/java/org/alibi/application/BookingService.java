@@ -36,7 +36,7 @@ public class BookingService {
         List<Long> bookedWorkspaceIds = bookingRepository.findAll().stream()
                 .filter(booking -> booking.getStartTime().toLocalDate().equals(date))
                 .map(Booking::getResourceId)
-                .collect(Collectors.toList());
+                .toList();
 
         return workspaceRepository.findAll().stream()
                 .filter(workspace -> !bookedWorkspaceIds.contains(workspace.getId()))

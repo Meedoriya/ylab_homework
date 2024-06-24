@@ -5,6 +5,7 @@ import org.alibi.domain.model.User;
 import org.alibi.out.ConsoleOutput;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -41,6 +42,7 @@ class BookingInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should book resource")
     void testBookResource() {
         String input = "1\n2023-06-21T10:00\n2023-06-21T12:00\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -57,6 +59,7 @@ class BookingInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should cancel booking")
     void testCancelBooking() {
         String input = "1\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -73,6 +76,7 @@ class BookingInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should filter bookings")
     void testFilterBookings() {
         String input = "2023-06-21\n1\n1\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());

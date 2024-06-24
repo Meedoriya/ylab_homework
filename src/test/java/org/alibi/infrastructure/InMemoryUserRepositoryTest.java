@@ -2,6 +2,7 @@ package org.alibi.infrastructure;
 
 import org.alibi.domain.model.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,6 +20,7 @@ class InMemoryUserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should add user")
     void saveShouldAddUser() {
         User user = new User();
         user.setUsername("user1");
@@ -30,6 +32,7 @@ class InMemoryUserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return user if exists")
     void findByIdShouldReturnUserIfExists() {
         User user = new User();
         user.setUsername("user1");
@@ -42,6 +45,7 @@ class InMemoryUserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return empty if not exists")
     void findByIdShouldReturnEmptyIfNotExists() {
         Optional<User> foundUser = userRepository.findById(1L);
 
@@ -49,6 +53,7 @@ class InMemoryUserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return user if exists")
     void findByUsernameShouldReturnUserIfExists() {
         User user = new User();
         user.setUsername("user1");
@@ -61,6 +66,7 @@ class InMemoryUserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return empty if not exists")
     void findByUsernameShouldReturnEmptyIfNotExists() {
         Optional<User> foundUser = userRepository.findByUsername("user1");
 
@@ -68,6 +74,7 @@ class InMemoryUserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should return all users")
     void findAllShouldReturnAllUsers() {
         User user1 = new User();
         user1.setUsername("user1");
@@ -83,6 +90,7 @@ class InMemoryUserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should modify existing user")
     void updateShouldModifyExistingUser() {
         User user = new User();
         user.setUsername("user1");
@@ -98,6 +106,7 @@ class InMemoryUserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Should remove user")
     void deleteShouldRemoveUser() {
         User user = new User();
         user.setUsername("user1");

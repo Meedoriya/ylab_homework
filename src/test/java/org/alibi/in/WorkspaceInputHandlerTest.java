@@ -38,6 +38,7 @@ class WorkspaceInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should add workspace")
     void testAddWorkspace() {
         String input = "Workspace 1\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -54,6 +55,7 @@ class WorkspaceInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should update workspace")
     void testUpdateWorkspace() {
         String input = "1\nWorkspace Updated\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -70,6 +72,7 @@ class WorkspaceInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should delete workspace")
     void testDeleteWorkspace() {
         String input = "1\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -86,6 +89,7 @@ class WorkspaceInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should view all workspaces")
     void testViewAllWorkspaces() {
         List<Workspace> workspaces = new ArrayList<>();
         workspaces.add(new Workspace(1L, "Workspace 1", true));

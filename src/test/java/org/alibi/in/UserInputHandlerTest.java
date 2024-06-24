@@ -34,6 +34,7 @@ class UserInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should register user")
     void testRegisterUser() {
         String input = "testuser\ntestpassword\nUSER\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
@@ -48,6 +49,7 @@ class UserInputHandlerTest {
     }
 
     @Test
+    @DisplayName("Should login user")
     void testLoginUser() {
         String input = "testuser\ntestpassword\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
