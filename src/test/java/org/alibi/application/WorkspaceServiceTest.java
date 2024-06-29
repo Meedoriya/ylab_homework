@@ -11,110 +11,59 @@ import org.mockito.Mockito;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 class WorkspaceServiceTest {
 
     private WorkspaceRepository workspaceRepository;
-    private AuthorizationService authorizationService;
     private WorkspaceService workspaceService;
+    private User mockUser;
 
     @BeforeEach
     void setUp() {
         workspaceRepository = Mockito.mock(WorkspaceRepository.class);
-        authorizationService = Mockito.mock(AuthorizationService.class);
-        workspaceService = new WorkspaceService(workspaceRepository, authorizationService);
+        workspaceService = new WorkspaceService(workspaceRepository);
+        mockUser = new User(1L, "registeredUser", "password"); // Создаем тестового пользователя
     }
 
     @Test
-    @DisplayName("Should call repository if admin")
-    void addWorkspaceShouldCallRepositoryIfAdmin() {
-        User adminUser = new User();
-        Workspace workspace = new Workspace();
+    @DisplayName("Should add workspace")
+    void shouldAddWorkspace() {
+        Workspace workspace = new Workspace(1L, "Workspace 1", true);
 
-        when(authorizationService.isAdmin(adminUser)).thenReturn(true);
+        workspaceService.addWorkspace(mockUser, workspace);
 
-        workspaceService.addWorkspace(adminUser, workspace);
-
-        verify(workspaceRepository).save(workspace);
+        Mockito.verify(workspaceRepository).save(workspace);
     }
 
     @Test
-    @DisplayName("Should throw exception if not admin")
-    void addWorkspaceShouldThrowExceptionIfNotAdmin() {
-        User user = new User();
-        Workspace workspace = new Workspace();
+    @DisplayName("Should update workspace")
+    void shouldUpdateWorkspace() {
+        Workspace workspace = new Workspace(1L, "Workspace 1", true);
 
-        when(authorizationService.isAdmin(user)).thenReturn(false);
+        workspaceService.updateWorkspace(mockUser, workspace);
 
-        assertThatThrownBy(() -> workspaceService.addWorkspace(user, workspace))
-                .isInstanceOf(SecurityException.class)
-                .hasMessage("Only admin can add workspaces.");
+        Mockito.verify(workspaceRepository).update(workspace);
     }
 
     @Test
-    @DisplayName("Should call repository if admin")
-    void updateWorkspaceShouldCallRepositoryIfAdmin() {
-        User adminUser = new User();
-        Workspace workspace = new Workspace();
-
-        when(authorizationService.isAdmin(adminUser)).thenReturn(true);
-
-        workspaceService.updateWorkspace(adminUser, workspace);
-
-        verify(workspaceRepository).update(workspace);
-    }
-
-    @Test
-    @DisplayName("Should throw exception if not admin")
-    void updateWorkspaceShouldThrowExceptionIfNotAdmin() {
-        User user = new User();
-        Workspace workspace = new Workspace();
-
-        when(authorizationService.isAdmin(user)).thenReturn(false);
-
-        assertThatThrownBy(() -> workspaceService.updateWorkspace(user, workspace))
-                .isInstanceOf(SecurityException.class)
-                .hasMessage("Only admin can update workspaces.");
-    }
-
-    @Test
-    @DisplayName("Should call repository if admin")
-    void deleteWorkspaceShouldCallRepositoryIfAdmin() {
-        User adminUser = new User();
+    @DisplayName("Should delete workspace")
+    void shouldDeleteWorkspace() {
         Long workspaceId = 1L;
 
-        when(authorizationService.isAdmin(adminUser)).thenReturn(true);
+        workspaceService.deleteWorkspace(mockUser, workspaceId);
 
-        workspaceService.deleteWorkspace(adminUser, workspaceId);
-
-        verify(workspaceRepository).delete(workspaceId);
+        Mockito.verify(workspaceRepository).delete(workspaceId);
     }
 
     @Test
-    @DisplayName("Should throw exception if not admin")
-    void deleteWorkspaceShouldThrowExceptionIfNotAdmin() {
-        User user = new User();
-        Long workspaceId = 1L;
+    @DisplayName("Should get all workspaces")
+    void shouldGetAllWorkspaces() {
+        Workspace workspace = new Workspace(1L, "Workspace 1", true);
+        when(workspaceRepository.findAll()).thenReturn(List.of(workspace));
 
-        when(authorizationService.isAdmin(user)).thenReturn(false);
+        List<Workspace> workspaces = workspaceService.getAllWorkspaces();
 
-        assertThatThrownBy(() -> workspaceService.deleteWorkspace(user, workspaceId))
-                .isInstanceOf(SecurityException.class)
-                .hasMessage("Only admin can delete workspaces.");
-    }
-
-    @Test
-    @DisplayName("Should return list from repository")
-    void getAllWorkspacesShouldReturnListFromRepository() {
-        List<Workspace> workspaces = List.of(new Workspace(), new Workspace());
-
-        when(workspaceRepository.findAll()).thenReturn(workspaces);
-
-        List<Workspace> result = workspaceService.getAllWorkspaces();
-
-        assertThat(result).isEqualTo(workspaces);
-        verify(workspaceRepository).findAll();
+        assertThat(workspaces).contains(workspace);
     }
 }

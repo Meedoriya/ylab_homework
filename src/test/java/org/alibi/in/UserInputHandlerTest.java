@@ -1,7 +1,6 @@
 package org.alibi.in;
 
 import org.alibi.application.UserService;
-import org.alibi.domain.model.Role;
 import org.alibi.domain.model.User;
 import org.junit.jupiter.api.*;
 
@@ -36,7 +35,7 @@ class UserInputHandlerTest {
     @Test
     @DisplayName("Should register user")
     void testRegisterUser() {
-        String input = "testuser\ntestpassword\nUSER\n";
+        String input = "testuser\ntestpassword\n";
         ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
         System.setIn(inContent);
 
@@ -44,7 +43,7 @@ class UserInputHandlerTest {
 
         userInputHandler.registerUser();
 
-        verify(userService).registerUser(eq("testuser"), eq("testpassword"), eq(Role.USER));
+        verify(userService).registerUser(eq("testuser"), eq("testpassword"));
         assertThat(outContent.toString()).contains("User registered successfully.");
     }
 

@@ -4,11 +4,10 @@ services:
     image: postgres:13
     container_name: coworking_postgres
     environment:
-      POSTGRES_USER: coworking_user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: coworking_service
+      POSTGRES_USER: alibi
+      POSTGRES_PASSWORD: alibi
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

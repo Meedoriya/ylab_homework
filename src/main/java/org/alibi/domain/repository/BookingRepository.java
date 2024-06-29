@@ -12,4 +12,5 @@ public interface BookingRepository {
     void update(Booking booking);
     void delete(Long id);
     boolean isConflict(Booking booking);
+    void deleteAll();
 }

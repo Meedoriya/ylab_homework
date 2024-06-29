@@ -13,20 +13,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConferenceRoomService {
     private final ConferenceRoomRepository conferenceRoomRepository;
-    private final AuthorizationService authorizationService;
 
     /**
      * Добавляет новый конференц-зал.
      *
      * @param user          Пользователь, выполняющий операцию.
      * @param conferenceRoom Конференц-зал для добавления.
-     * @throws SecurityException если пользователь не является администратором.
      */
     public void addConferenceRoom(User user, ConferenceRoom conferenceRoom) {
-        if (authorizationService.isAdmin(user)) {
+        if (isRegisteredUser(user)) {
             conferenceRoomRepository.save(conferenceRoom);
         } else {
-            throw new SecurityException("Only admin can add conference rooms.");
+            throw new SecurityException("Only registered users can add conference rooms.");
         }
     }
 
@@ -35,13 +33,12 @@ public class ConferenceRoomService {
      *
      * @param user          Пользователь, выполняющий операцию.
      * @param conferenceRoom Конференц-зал для обновления.
-     * @throws SecurityException если пользователь не является администратором.
      */
     public void updateConferenceRoom(User user, ConferenceRoom conferenceRoom) {
-        if (authorizationService.isAdmin(user)) {
+        if (isRegisteredUser(user)) {
             conferenceRoomRepository.update(conferenceRoom);
         } else {
-            throw new SecurityException("Only admin can update conference rooms.");
+            throw new SecurityException("Only registered users can update conference rooms.");
         }
     }
 
@@ -50,13 +47,12 @@ public class ConferenceRoomService {
      *
      * @param user Пользователь, выполняющий операцию.
      * @param id   ID конференц-зала для удаления.
-     * @throws SecurityException если пользователь не является администратором.
      */
     public void deleteConferenceRoom(User user, Long id) {
-        if (authorizationService.isAdmin(user)) {
+        if (isRegisteredUser(user)) {
             conferenceRoomRepository.delete(id);
         } else {
-            throw new SecurityException("Only admin can delete conference rooms.");
+            throw new SecurityException("Only registered users can delete conference rooms.");
         }
     }
 
@@ -67,5 +63,10 @@ public class ConferenceRoomService {
      */
     public List<ConferenceRoom> getAllConferenceRooms() {
         return conferenceRoomRepository.findAll();
+    }
+
+    private boolean isRegisteredUser(User user) {
+        // Здесь можно добавить логику проверки, зарегистрирован ли пользователь
+        return user != null;
     }
 }

@@ -19,11 +19,12 @@ public class WorkspaceInputHandler {
      * Конструктор.
      *
      * @param workspaceService Сервис для работы с рабочими местами.
+     * @param scanner          Сканнер для чтения ввода пользователя.
      * @param consoleOutput    Объект для вывода на консоль.
      */
-    public WorkspaceInputHandler(WorkspaceService workspaceService, ConsoleOutput consoleOutput) {
+    public WorkspaceInputHandler(WorkspaceService workspaceService, Scanner scanner, ConsoleOutput consoleOutput) {
         this.workspaceService = workspaceService;
-        this.scanner = new Scanner(System.in);
+        this.scanner = scanner;
         this.consoleOutput = consoleOutput;
     }
 

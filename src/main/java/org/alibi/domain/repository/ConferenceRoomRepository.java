@@ -11,4 +11,6 @@ public interface ConferenceRoomRepository {
     List<ConferenceRoom> findAll();
     void update(ConferenceRoom conferenceRoom);
     void delete(Long id);
+
+    void deleteAll();
 }

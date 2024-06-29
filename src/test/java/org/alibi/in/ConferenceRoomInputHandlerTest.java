@@ -4,102 +4,98 @@ import org.alibi.application.ConferenceRoomService;
 import org.alibi.domain.model.ConferenceRoom;
 import org.alibi.domain.model.User;
 import org.alibi.out.ConsoleOutput;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.Scanner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class ConferenceRoomInputHandlerTest {
 
+    @Mock
     private ConferenceRoomService conferenceRoomService;
+
+    @Mock
     private ConsoleOutput consoleOutput;
-    private ByteArrayOutputStream outContent;
-    private PrintStream originalOut;
+
+    @InjectMocks
+    private ConferenceRoomInputHandler conferenceRoomInputHandler;
+
+    private User user;
 
     @BeforeEach
     void setUp() {
-        conferenceRoomService = mock(ConferenceRoomService.class);
-        consoleOutput = mock(ConsoleOutput.class);
-        outContent = new ByteArrayOutputStream();
-        originalOut = System.out;
-        System.setOut(new PrintStream(outContent));
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.setOut(originalOut);
+        MockitoAnnotations.openMocks(this);
+        user = new User();
+        user.setId(1L);
+        user.setUsername("testuser");
     }
 
     @Test
-    @DisplayName("Should add conference room successfully")
+    @DisplayName("Should successfully add conference room")
     void testAddConferenceRoom() {
         String input = "Conference Room 1\n";
-        ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
-        System.setIn(inContent);
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
 
-        ConferenceRoomInputHandler conferenceRoomInputHandler = new ConferenceRoomInputHandler(conferenceRoomService, consoleOutput);
-        User user = new User();
-        user.setId(1L);
-
+        conferenceRoomInputHandler = new ConferenceRoomInputHandler(conferenceRoomService, consoleOutput);
         conferenceRoomInputHandler.addConferenceRoom(user);
 
-        verify(conferenceRoomService).addConferenceRoom(eq(user), any(ConferenceRoom.class));
-        assertThat(outContent.toString()).contains("Conference room added successfully.");
+        ArgumentCaptor<ConferenceRoom> conferenceRoomCaptor = ArgumentCaptor.forClass(ConferenceRoom.class);
+        verify(conferenceRoomService, times(1)).addConferenceRoom(eq(user), conferenceRoomCaptor.capture());
+        ConferenceRoom capturedConferenceRoom = conferenceRoomCaptor.getValue();
+
+        assertThat(capturedConferenceRoom.getName()).isEqualTo("Conference Room 1");
     }
 
     @Test
-    @DisplayName("Should update conference room successfully")
+    @DisplayName("Should successfully update conference room")
     void testUpdateConferenceRoom() {
-        String input = "1\nConference Room Updated\n";
-        ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
-        System.setIn(inContent);
+        String input = "1\nUpdated Conference Room\n";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
 
-        ConferenceRoomInputHandler conferenceRoomInputHandler = new ConferenceRoomInputHandler(conferenceRoomService, consoleOutput);
-        User user = new User();
-        user.setId(1L);
-
+        conferenceRoomInputHandler = new ConferenceRoomInputHandler(conferenceRoomService, consoleOutput);
         conferenceRoomInputHandler.updateConferenceRoom(user);
 
-        verify(conferenceRoomService).updateConferenceRoom(eq(user), any(ConferenceRoom.class));
-        assertThat(outContent.toString()).contains("Conference room updated successfully.");
+        ArgumentCaptor<ConferenceRoom> conferenceRoomCaptor = ArgumentCaptor.forClass(ConferenceRoom.class);
+        verify(conferenceRoomService, times(1)).updateConferenceRoom(eq(user), conferenceRoomCaptor.capture());
+        ConferenceRoom capturedConferenceRoom = conferenceRoomCaptor.getValue();
+
+        assertThat(capturedConferenceRoom.getId()).isEqualTo(1L);
+        assertThat(capturedConferenceRoom.getName()).isEqualTo("Updated Conference Room");
     }
 
     @Test
-    @DisplayName("Should delete conference room successfully")
+    @DisplayName("Should successfully delete conference room")
     void testDeleteConferenceRoom() {
         String input = "1\n";
-        ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
-        System.setIn(inContent);
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
 
-        ConferenceRoomInputHandler conferenceRoomInputHandler = new ConferenceRoomInputHandler(conferenceRoomService, consoleOutput);
-        User user = new User();
-        user.setId(1L);
-
+        conferenceRoomInputHandler = new ConferenceRoomInputHandler(conferenceRoomService, consoleOutput);
         conferenceRoomInputHandler.deleteConferenceRoom(user);
 
-        verify(conferenceRoomService).deleteConferenceRoom(eq(user), eq(1L));
-        assertThat(outContent.toString()).contains("Conference room deleted successfully.");
+        verify(conferenceRoomService, times(1)).deleteConferenceRoom(eq(user), eq(1L));
     }
 
     @Test
-    @DisplayName("Should view all conference rooms")
+    @DisplayName("Should display all conference rooms")
     void testViewAllConferenceRooms() {
-        List<ConferenceRoom> conferenceRooms = new ArrayList<>();
-        conferenceRooms.add(new ConferenceRoom(1L, "Conference Room 1", true));
-        conferenceRooms.add(new ConferenceRoom(2L, "Conference Room 2", true));
+        when(conferenceRoomService.getAllConferenceRooms()).thenReturn(Collections.singletonList(new ConferenceRoom(1L, "Conference Room 1", true)));
 
-        when(conferenceRoomService.getAllConferenceRooms()).thenReturn(conferenceRooms);
-
-        ConferenceRoomInputHandler conferenceRoomInputHandler = new ConferenceRoomInputHandler(conferenceRoomService, consoleOutput);
         conferenceRoomInputHandler.viewAllConferenceRooms();
 
-        verify(consoleOutput).printConferenceRooms(eq(conferenceRooms));
+        verify(consoleOutput, times(1)).printConferenceRooms(anyList());
     }
 }

@@ -11,4 +11,5 @@ public interface WorkspaceRepository {
     List<Workspace> findAll();
     void update(Workspace workspace);
     void delete(Long id);
+    void deleteAll();
 }

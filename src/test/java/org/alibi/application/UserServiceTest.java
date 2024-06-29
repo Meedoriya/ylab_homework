@@ -1,89 +1,80 @@
 package org.alibi.application;
 
-import org.alibi.domain.model.Role;
 import org.alibi.domain.model.User;
 import org.alibi.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Mockito;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 class UserServiceTest {
 
-    @Mock
     private UserRepository userRepository;
-
-    @InjectMocks
     private UserService userService;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        userRepository = Mockito.mock(UserRepository.class);
+        userService = new UserService(userRepository);
     }
 
     @Test
-    @DisplayName("Should register user")
-    void registerUserShouldRegisterUser() {
-        String username = "user";
-        String password = "password";
-        Role role = Role.USER;
+    @DisplayName("Should register new user")
+    void shouldRegisterNewUser() {
+        String username = "testUser";
+        String password = "testPassword";
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        userService.registerUser(username, password, role);
+        userService.registerUser(username, password);
 
-        verify(userRepository, times(1)).save(any(User.class));
+        Mockito.verify(userRepository).save(Mockito.any(User.class));
     }
 
     @Test
-    @DisplayName("Should throw exception when user already exists")
-    void registerUserShouldThrowExceptionWhenUserAlreadyExists() {
-        String username = "user";
-        String password = "password";
-        Role role = Role.USER;
+    @DisplayName("Should throw exception if user already exists")
+    void shouldThrowExceptionIfUserAlreadyExists() {
+        String username = "testUser";
+        String password = "testPassword";
+        User existingUser = new User(1L, username, password);
 
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(new User()));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(existingUser));
 
-        assertThatThrownBy(() -> userService.registerUser(username, password, role))
+        assertThatThrownBy(() -> userService.registerUser(username, password))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("User already exists");
+                .hasMessage("User already exists");
     }
 
     @Test
-    @DisplayName("Should return user when credentials are valid")
-    void loginUserShouldReturnUserWhenCredentialsAreValid() {
-        String username = "user";
-        String password = "password";
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
+    @DisplayName("Should login user with correct credentials")
+    void shouldLoginUserWithCorrectCredentials() {
+        String username = "testUser";
+        String password = "testPassword";
+        User user = new User(1L, username, password);
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-        User result = userService.loginUser(username, password);
+        User loggedInUser = userService.loginUser(username, password);
 
-        assertThat(result).isEqualTo(user);
+        assertThat(loggedInUser).isEqualTo(user);
     }
 
     @Test
-    @DisplayName("Should throw exception when credentials are invalid")
-    void loginUserShouldThrowExceptionWhenCredentialsAreInvalid() {
-        String username = "user";
-        String password = "password";
+    @DisplayName("Should throw exception if username or password is incorrect")
+    void shouldThrowExceptionIfUsernameOrPasswordIsIncorrect() {
+        String username = "testUser";
+        String password = "testPassword";
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.loginUser(username, password))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid username or password");
+                .hasMessage("Invalid username or password");
     }
 }
-

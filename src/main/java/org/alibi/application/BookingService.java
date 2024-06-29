@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 public class BookingService {
 
     private final BookingRepository bookingRepository;
-    private final AuthorizationService authorizationService;
     private final ConferenceRoomRepository conferenceRoomRepository;
     private final WorkspaceRepository workspaceRepository;
 
@@ -84,7 +83,7 @@ public class BookingService {
         List<Booking> existingBookings = bookingRepository.findAll().stream()
                 .filter(booking -> booking.getResourceId().equals(resourceId))
                 .filter(booking -> booking.getEndTime().isAfter(startTime) && booking.getStartTime().isBefore(endTime))
-                .collect(Collectors.toList());
+                .toList();
 
         if (!existingBookings.isEmpty()) {
             throw new IllegalArgumentException("Booking conflict detected");
@@ -100,18 +99,12 @@ public class BookingService {
     }
 
     /**
-     * Возвращает список всех бронирований, доступных пользователю.
+     * Возвращает список всех бронирований.
      *
-     * @param user Пользователь, запрашивающий список бронирований.
      * @return Список всех бронирований.
-     * @throws SecurityException если пользователь не является администратором.
      */
-    public List<Booking> getAllBookings(User user) {
-        if (authorizationService.isAdmin(user)) {
-            return bookingRepository.findAll();
-        } else {
-            throw new SecurityException("Only admin can view all bookings");
-        }
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
     }
 
     /**
@@ -147,17 +140,12 @@ public class BookingService {
      *
      * @param user Пользователь, запрашивающий отмену бронирования.
      * @param id   ID бронирования.
-     * @throws SecurityException если пользователь не является администратором или не является владельцем бронирования.
      * @throws IllegalArgumentException если бронирование не найдено.
      */
     public void cancelBooking(User user, Long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isPresent()) {
-            if (authorizationService.isAdmin(user) || booking.get().getUserId().equals(user.getId())) {
-                bookingRepository.delete(id);
-            } else {
-                throw new SecurityException("You can cancel only your own bookings.");
-            }
+            bookingRepository.delete(id);
         } else {
             throw new IllegalArgumentException("Booking not found.");
         }

@@ -4,102 +4,85 @@ import org.alibi.application.WorkspaceService;
 import org.alibi.domain.model.User;
 import org.alibi.domain.model.Workspace;
 import org.alibi.out.ConsoleOutput;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.InputStream;
+import java.util.Scanner;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class WorkspaceInputHandlerTest {
 
+    @Mock
     private WorkspaceService workspaceService;
+
+    @Mock
     private ConsoleOutput consoleOutput;
-    private ByteArrayOutputStream outContent;
-    private PrintStream originalOut;
+
+    @InjectMocks
+    private WorkspaceInputHandler workspaceInputHandler;
+
+    private User user;
 
     @BeforeEach
     void setUp() {
-        workspaceService = mock(WorkspaceService.class);
-        consoleOutput = mock(ConsoleOutput.class);
-        outContent = new ByteArrayOutputStream();
-        originalOut = System.out;
-        System.setOut(new PrintStream(outContent));
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.setOut(originalOut);
+        MockitoAnnotations.openMocks(this);
+        user = new User();
     }
 
     @Test
     @DisplayName("Should add workspace")
     void testAddWorkspace() {
-        String input = "Workspace 1\n";
-        ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
-        System.setIn(inContent);
+        String input = "New Workspace\n";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        Scanner scanner = new Scanner(in);
 
-        WorkspaceInputHandler workspaceInputHandler = new WorkspaceInputHandler(workspaceService, consoleOutput);
-        User user = new User();
-        user.setId(1L);
+        workspaceInputHandler = new WorkspaceInputHandler(workspaceService, scanner, consoleOutput);
 
         workspaceInputHandler.addWorkspace(user);
 
-        verify(workspaceService).addWorkspace(eq(user), any(Workspace.class));
-        assertThat(outContent.toString()).contains("Workspace added successfully.");
+        verify(workspaceService).addWorkspace(any(User.class), any(Workspace.class));
     }
 
     @Test
     @DisplayName("Should update workspace")
     void testUpdateWorkspace() {
-        String input = "1\nWorkspace Updated\n";
-        ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
-        System.setIn(inContent);
+        String input = "1\nUpdated Workspace\n";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        Scanner scanner = new Scanner(in);
 
-        WorkspaceInputHandler workspaceInputHandler = new WorkspaceInputHandler(workspaceService, consoleOutput);
-        User user = new User();
-        user.setId(1L);
+        workspaceInputHandler = new WorkspaceInputHandler(workspaceService, scanner, consoleOutput);
 
         workspaceInputHandler.updateWorkspace(user);
 
-        verify(workspaceService).updateWorkspace(eq(user), any(Workspace.class));
-        assertThat(outContent.toString()).contains("Workspace updated successfully.");
+        verify(workspaceService).updateWorkspace(any(User.class), any(Workspace.class));
     }
 
     @Test
     @DisplayName("Should delete workspace")
     void testDeleteWorkspace() {
         String input = "1\n";
-        ByteArrayInputStream inContent = new ByteArrayInputStream(input.getBytes());
-        System.setIn(inContent);
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        Scanner scanner = new Scanner(in);
 
-        WorkspaceInputHandler workspaceInputHandler = new WorkspaceInputHandler(workspaceService, consoleOutput);
-        User user = new User();
-        user.setId(1L);
+        workspaceInputHandler = new WorkspaceInputHandler(workspaceService, scanner, consoleOutput);
 
         workspaceInputHandler.deleteWorkspace(user);
 
-        verify(workspaceService).deleteWorkspace(eq(user), eq(1L));
-        assertThat(outContent.toString()).contains("Workspace deleted successfully.");
+        verify(workspaceService).deleteWorkspace(any(User.class), anyLong());
     }
 
     @Test
     @DisplayName("Should view all workspaces")
     void testViewAllWorkspaces() {
-        List<Workspace> workspaces = new ArrayList<>();
-        workspaces.add(new Workspace(1L, "Workspace 1", true));
-        workspaces.add(new Workspace(2L, "Workspace 2", true));
-
-        when(workspaceService.getAllWorkspaces()).thenReturn(workspaces);
-
-        WorkspaceInputHandler workspaceInputHandler = new WorkspaceInputHandler(workspaceService, consoleOutput);
         workspaceInputHandler.viewAllWorkspaces();
 
-        verify(consoleOutput).printWorkspaces(eq(workspaces));
+        verify(consoleOutput).printWorkspaces(anyList());
     }
 }

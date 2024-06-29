@@ -1,7 +1,6 @@
 package org.alibi.in;
 
 import org.alibi.application.UserService;
-import org.alibi.domain.model.Role;
 import org.alibi.domain.model.User;
 
 import java.util.Scanner;
@@ -31,10 +30,8 @@ public class UserInputHandler {
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
-        System.out.print("Enter role (USER/ADMIN): ");
-        Role role = Role.valueOf(scanner.nextLine().toUpperCase());
 
-        userService.registerUser(username, password, role);
+        userService.registerUser(username, password);
         System.out.println("User registered successfully.");
     }
 

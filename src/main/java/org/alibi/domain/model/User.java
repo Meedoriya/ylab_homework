@@ -29,8 +29,4 @@ public class User {
      */
     String password;
 
-    /**
-     * Роль пользователя.
-     */
-    Role role;
 }

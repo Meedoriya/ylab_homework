@@ -1,7 +1,6 @@
 package org.alibi.application;
 
 import lombok.RequiredArgsConstructor;
-import org.alibi.domain.model.Role;
 import org.alibi.domain.model.User;
 import org.alibi.domain.repository.UserRepository;
 
@@ -19,10 +18,9 @@ public class UserService {
      *
      * @param username Имя пользователя.
      * @param password Пароль пользователя.
-     * @param role     Роль пользователя.
      * @throws IllegalArgumentException если пользователь с таким именем уже существует.
      */
-    public void registerUser(String username, String password, Role role) {
+    public void registerUser(String username, String password) {
         Optional<User> existingUser = userRepository.findByUsername(username);
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("User already exists");
@@ -31,7 +29,6 @@ public class UserService {
         User user = new User();
         user.setUsername(username);
         user.setPassword(password);
-        user.setRole(role);
 
         userRepository.save(user);
     }
