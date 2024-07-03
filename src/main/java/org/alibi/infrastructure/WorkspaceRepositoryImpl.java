@@ -3,6 +3,7 @@ package org.alibi.infrastructure;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.alibi.domain.model.User;
 import org.alibi.domain.model.Workspace;
 import org.alibi.domain.repository.WorkspaceRepository;
 
@@ -58,11 +59,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    Workspace workspace = new Workspace();
-                    workspace.setId(resultSet.getLong("id"));
-                    workspace.setName(resultSet.getString("name"));
-                    workspace.setAvailable(resultSet.getBoolean("available"));
-                    return Optional.of(workspace);
+                    return Optional.of(mapToWorkspace(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -84,10 +81,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Workspace workspace = new Workspace();
-                workspace.setId(resultSet.getLong("id"));
-                workspace.setName(resultSet.getString("name"));
-                workspace.setAvailable(resultSet.getBoolean("available"));
+                Workspace workspace = mapToWorkspace(resultSet);
                 workspaces.add(workspace);
             }
         } catch (SQLException e) {
@@ -144,6 +138,21 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             e.printStackTrace();
             throw new RuntimeException("Error deleting all workspaces", e);
         }
+    }
+
+    /**
+     * Преобразует строку из {@link ResultSet} в объект {@link Workspace}.
+     *
+     * @param resultSet объект {@link ResultSet}, из которого извлекаются данные. Должен быть установлен на допустимую строку.
+     * @return объект {@link User}, заполненный данными из текущей строки {@link ResultSet}.
+     * @throws SQLException если происходит ошибка при доступе к {@link ResultSet}.
+     */
+    private Workspace mapToWorkspace(ResultSet resultSet) throws SQLException {
+        Workspace workspace = new Workspace();
+        workspace.setId(resultSet.getLong("id"));
+        workspace.setName(resultSet.getString("name"));
+        workspace.setAvailable(resultSet.getBoolean("available"));
+        return workspace;
     }
 
 }

@@ -61,11 +61,7 @@ public class ConferenceRoomRepositoryImpl implements ConferenceRoomRepository {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    ConferenceRoom conferenceRoom = new ConferenceRoom();
-                    conferenceRoom.setId(resultSet.getLong("id"));
-                    conferenceRoom.setName(resultSet.getString("name"));
-                    conferenceRoom.setAvailable(resultSet.getBoolean("available"));
-                    return Optional.of(conferenceRoom);
+                    return Optional.of(mapToConferenceRoom(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -87,10 +83,7 @@ public class ConferenceRoomRepositoryImpl implements ConferenceRoomRepository {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                ConferenceRoom conferenceRoom = new ConferenceRoom();
-                conferenceRoom.setId(resultSet.getLong("id"));
-                conferenceRoom.setName(resultSet.getString("name"));
-                conferenceRoom.setAvailable(resultSet.getBoolean("available"));
+                ConferenceRoom conferenceRoom = mapToConferenceRoom(resultSet);
                 conferenceRooms.add(conferenceRoom);
             }
         } catch (SQLException e) {
@@ -148,6 +141,21 @@ public class ConferenceRoomRepositoryImpl implements ConferenceRoomRepository {
             e.printStackTrace();
             throw new RuntimeException("Error deleting all conference rooms", e);
         }
+    }
+
+    /**
+     * Преобразует строку из {@link ResultSet} в объект {@link ConferenceRoom}.
+     *
+     * @param resultSet объект {@link ResultSet}, из которого извлекаются данные. Должен быть установлен на допустимую строку.
+     * @return объект {@link ConferenceRoom}, заполненный данными из текущей строки {@link ResultSet}.
+     * @throws SQLException если происходит ошибка при доступе к {@link ResultSet}.
+     */
+    private ConferenceRoom mapToConferenceRoom(ResultSet resultSet) throws SQLException {
+        ConferenceRoom conferenceRoom = new ConferenceRoom();
+        conferenceRoom.setId(resultSet.getLong("id"));
+        conferenceRoom.setName(resultSet.getString("name"));
+        conferenceRoom.setAvailable(resultSet.getBoolean("available"));
+        return conferenceRoom;
     }
 
 }

@@ -61,13 +61,7 @@ public class BookingRepositoryImpl implements BookingRepository {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    Booking booking = new Booking();
-                    booking.setId(resultSet.getLong("id"));
-                    booking.setUserId(resultSet.getLong("user_id"));
-                    booking.setResourceId(resultSet.getLong("resource_id"));
-                    booking.setStartTime(resultSet.getObject("start_time", LocalDateTime.class));
-                    booking.setEndTime(resultSet.getObject("end_time", LocalDateTime.class));
-                    return Optional.of(booking);
+                    return Optional.of(mapToBooking(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -89,12 +83,7 @@ public class BookingRepositoryImpl implements BookingRepository {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()) {
-                Booking booking = new Booking();
-                booking.setId(resultSet.getLong("id"));
-                booking.setUserId(resultSet.getLong("user_id"));
-                booking.setResourceId(resultSet.getLong("resource_id"));
-                booking.setStartTime(resultSet.getObject("start_time", LocalDateTime.class));
-                booking.setEndTime(resultSet.getObject("end_time", LocalDateTime.class));
+                Booking booking = mapToBooking(resultSet);
                 bookings.add(booking);
             }
         } catch (SQLException e) {
@@ -184,4 +173,20 @@ public class BookingRepositoryImpl implements BookingRepository {
         }
     }
 
+    /**
+     * Преобразует строку из {@link ResultSet} в объект {@link Booking}.
+     *
+     * @param resultSet объект {@link ResultSet}, из которого извлекаются данные. Должен быть установлен на допустимую строку.
+     * @return объект {@link Booking}, заполненный данными из текущей строки {@link ResultSet}.
+     * @throws SQLException если происходит ошибка при доступе к {@link ResultSet}.
+     */
+    private Booking mapToBooking(ResultSet resultSet) throws SQLException {
+        Booking booking = new Booking();
+        booking.setId(resultSet.getLong("id"));
+        booking.setUserId(resultSet.getLong("user_id"));
+        booking.setResourceId(resultSet.getLong("resource_id"));
+        booking.setStartTime(resultSet.getObject("start_time", LocalDateTime.class));
+        booking.setEndTime(resultSet.getObject("end_time", LocalDateTime.class));
+        return booking;
+    }
 }

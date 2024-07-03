@@ -3,6 +3,7 @@ package org.alibi.infrastructure;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.alibi.domain.model.ConferenceRoom;
 import org.alibi.domain.model.User;
 import org.alibi.domain.repository.UserRepository;
 
@@ -58,11 +59,7 @@ public class UserRepositoryImpl implements UserRepository {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    User user = new User();
-                    user.setId(resultSet.getLong("id"));
-                    user.setUsername(resultSet.getString("username"));
-                    user.setPassword(resultSet.getString("password"));
-                    return Optional.of(user);
+                    return Optional.of(mapToUser(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -85,11 +82,7 @@ public class UserRepositoryImpl implements UserRepository {
             preparedStatement.setString(1, username);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    User user = new User();
-                    user.setId(resultSet.getLong("id"));
-                    user.setUsername(resultSet.getString("username"));
-                    user.setPassword(resultSet.getString("password"));
-                    return Optional.of(user);
+                    return Optional.of(mapToUser(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -111,10 +104,7 @@ public class UserRepositoryImpl implements UserRepository {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                User user = new User();
-                user.setId(resultSet.getLong("id"));
-                user.setUsername(resultSet.getString("username"));
-                user.setPassword(resultSet.getString("password"));
+                User user = mapToUser(resultSet);
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -172,5 +162,20 @@ public class UserRepositoryImpl implements UserRepository {
             e.printStackTrace();
             throw new RuntimeException("Error deleting all users", e);
         }
+    }
+
+    /**
+     * Преобразует строку из {@link ResultSet} в объект {@link User}.
+     *
+     * @param resultSet объект {@link ResultSet}, из которого извлекаются данные. Должен быть установлен на допустимую строку.
+     * @return объект {@link User}, заполненный данными из текущей строки {@link ResultSet}.
+     * @throws SQLException если происходит ошибка при доступе к {@link ResultSet}.
+     */
+    private User mapToUser(ResultSet resultSet) throws SQLException {
+        User user = new User();
+        user.setId(resultSet.getLong("id"));
+        user.setUsername(resultSet.getString("username"));
+        user.setPassword(resultSet.getString("password"));
+        return user;
     }
 }
