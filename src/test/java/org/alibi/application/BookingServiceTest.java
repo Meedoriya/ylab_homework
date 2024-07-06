@@ -2,25 +2,30 @@ package org.alibi.application;
 
 import org.alibi.domain.model.Booking;
 import org.alibi.domain.model.ConferenceRoom;
-import org.alibi.domain.model.User;
 import org.alibi.domain.model.Workspace;
 import org.alibi.domain.repository.BookingRepository;
 import org.alibi.domain.repository.ConferenceRoomRepository;
 import org.alibi.domain.repository.WorkspaceRepository;
+import org.alibi.dto.BookingDto;
+import org.alibi.dto.ConferenceRoomDto;
+import org.alibi.dto.UserDto;
+import org.alibi.dto.WorkspaceDto;
+import org.alibi.mapper.BookingMapper;
+import org.alibi.mapper.ConferenceRoomMapper;
+import org.alibi.mapper.WorkspaceMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class BookingServiceTest {
 
@@ -28,90 +33,78 @@ class BookingServiceTest {
     private ConferenceRoomRepository conferenceRoomRepository;
     private WorkspaceRepository workspaceRepository;
     private BookingService bookingService;
+    private BookingMapper bookingMapper = BookingMapper.INSTANCE;
+    private ConferenceRoomMapper conferenceRoomMapper = ConferenceRoomMapper.INSTANCE;
+    private WorkspaceMapper workspaceMapper = WorkspaceMapper.INSTANCE;
 
     @BeforeEach
     void setUp() {
-        bookingRepository = Mockito.mock(BookingRepository.class);
-        conferenceRoomRepository = Mockito.mock(ConferenceRoomRepository.class);
-        workspaceRepository = Mockito.mock(WorkspaceRepository.class);
+        bookingRepository = mock(BookingRepository.class);
+        conferenceRoomRepository = mock(ConferenceRoomRepository.class);
+        workspaceRepository = mock(WorkspaceRepository.class);
         bookingService = new BookingService(bookingRepository, conferenceRoomRepository, workspaceRepository);
     }
 
     @Test
-    @DisplayName("Should get available workspaces for a date")
-    void shouldGetAvailableWorkspacesForDate() {
+    @DisplayName("Should get available workspaces for a specific date")
+    void getAvailableWorkspaces() {
         LocalDate date = LocalDate.now();
-        Workspace workspace = new Workspace(1L, "Workspace 1", true);
-        when(workspaceRepository.findAll()).thenReturn(List.of(workspace));
-        when(bookingRepository.findAll()).thenReturn(Collections.emptyList());
+        List<Workspace> workspaces = List.of(new Workspace(1L, "Workspace 1", true));
+        when(workspaceRepository.findAll()).thenReturn(workspaces);
+        when(bookingRepository.findAll()).thenReturn(List.of());
 
-        List<Workspace> availableWorkspaces = bookingService.getAvailableWorkspaces(date);
+        List<WorkspaceDto> availableWorkspaces = bookingService.getAvailableWorkspaces(date);
 
-        assertThat(availableWorkspaces).contains(workspace);
+        assertThat(availableWorkspaces).hasSize(1);
+        assertThat(availableWorkspaces.get(0).getName()).isEqualTo("Workspace 1");
     }
 
     @Test
-    @DisplayName("Should get available conference rooms for a date")
-    void shouldGetAvailableConferenceRoomsForDate() {
+    @DisplayName("Should get available conference rooms for a specific date")
+    void getAvailableConferenceRooms() {
         LocalDate date = LocalDate.now();
-        ConferenceRoom conferenceRoom = new ConferenceRoom(1L, "Conference Room 1", true);
-        when(conferenceRoomRepository.findAll()).thenReturn(List.of(conferenceRoom));
-        when(bookingRepository.findAll()).thenReturn(Collections.emptyList());
+        List<ConferenceRoom> conferenceRooms = List.of(new ConferenceRoom(1L, "Conference Room 1", true));
+        when(conferenceRoomRepository.findAll()).thenReturn(conferenceRooms);
+        when(bookingRepository.findAll()).thenReturn(List.of());
 
-        List<ConferenceRoom> availableConferenceRooms = bookingService.getAvailableConferenceRooms(date);
+        List<ConferenceRoomDto> availableConferenceRooms = bookingService.getAvailableConferenceRooms(date);
 
-        assertThat(availableConferenceRooms).contains(conferenceRoom);
+        assertThat(availableConferenceRooms).hasSize(1);
+        assertThat(availableConferenceRooms.get(0).getName()).isEqualTo("Conference Room 1");
     }
 
     @Test
-    @DisplayName("Should book a resource")
-    void shouldBookResource() {
+    @DisplayName("Should book resource successfully")
+    void bookResource() {
         Long userId = 1L;
         Long resourceId = 1L;
         LocalDateTime startTime = LocalDateTime.now().plusHours(1);
         LocalDateTime endTime = startTime.plusHours(1);
 
         when(workspaceRepository.findById(resourceId)).thenReturn(Optional.of(new Workspace()));
-        when(bookingRepository.findAll()).thenReturn(Collections.emptyList());
+        when(bookingRepository.findAll()).thenReturn(List.of());
 
         bookingService.bookResource(userId, resourceId, startTime, endTime);
 
-        Mockito.verify(bookingRepository).save(Mockito.any(Booking.class));
+        verify(bookingRepository, times(1)).save(any(Booking.class));
     }
 
     @Test
-    @DisplayName("Should throw exception when booking resource with conflict")
-    void shouldThrowExceptionWhenBookingResourceWithConflict() {
+    @DisplayName("Should throw exception when start time is after end time")
+    void bookResource_InvalidTime() {
         Long userId = 1L;
         Long resourceId = 1L;
-        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
-        LocalDateTime endTime = startTime.plusHours(1);
-        Booking existingBooking = new Booking(1L, userId, resourceId, startTime, endTime);
-
-        when(workspaceRepository.findById(resourceId)).thenReturn(Optional.of(new Workspace()));
-        when(bookingRepository.findAll()).thenReturn(List.of(existingBooking));
-
-        assertThatThrownBy(() -> bookingService.bookResource(userId, resourceId, startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Booking conflict detected");
-    }
-
-    @Test
-    @DisplayName("Should throw exception when booking resource with invalid time")
-    void shouldThrowExceptionWhenBookingResourceWithInvalidTime() {
-        Long userId = 1L;
-        Long resourceId = 1L;
-        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime startTime = LocalDateTime.now().plusHours(2);
         LocalDateTime endTime = startTime.minusHours(1);
 
-        assertThatThrownBy(() -> bookingService.bookResource(userId, resourceId, startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Start time must be before end time");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                bookingService.bookResource(userId, resourceId, startTime, endTime));
+        assertThat(exception.getMessage()).isEqualTo("Start time must be before end time");
     }
 
     @Test
-    @DisplayName("Should throw exception when booking non-existent resource")
-    void shouldThrowExceptionWhenBookingNonExistentResource() {
+    @DisplayName("Should throw exception when resource not found")
+    void bookResource_ResourceNotFound() {
         Long userId = 1L;
         Long resourceId = 1L;
         LocalDateTime startTime = LocalDateTime.now().plusHours(1);
@@ -120,92 +113,89 @@ class BookingServiceTest {
         when(workspaceRepository.findById(resourceId)).thenReturn(Optional.empty());
         when(conferenceRoomRepository.findById(resourceId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> bookingService.bookResource(userId, resourceId, startTime, endTime))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Resource not found");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                bookingService.bookResource(userId, resourceId, startTime, endTime));
+        assertThat(exception.getMessage()).isEqualTo("Resource not found");
     }
 
     @Test
-    @DisplayName("Should get all bookings")
-    void shouldGetAllBookings() {
-        Booking booking = new Booking(1L, 1L, 1L, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-        when(bookingRepository.findAll()).thenReturn(List.of(booking));
-
-        List<Booking> bookings = bookingService.getAllBookings();
-
-        assertThat(bookings).contains(booking);
-    }
-
-    @Test
-    @DisplayName("Should get filtered bookings by date")
-    void shouldGetFilteredBookingsByDate() {
-        LocalDate date = LocalDate.now();
-        Booking booking = new Booking(1L, 1L, 1L, date.atStartOfDay(), date.atStartOfDay().plusHours(1));
-        when(bookingRepository.findAll()).thenReturn(List.of(booking));
-
-        List<Booking> bookings = bookingService.getFilteredBookings(Optional.of(date), Optional.empty(), Optional.empty());
-
-        assertThat(bookings).contains(booking);
-    }
-
-    @Test
-    @DisplayName("Should get filtered bookings by user ID")
-    void shouldGetFilteredBookingsByUserId() {
+    @DisplayName("Should throw exception when booking conflict detected")
+    void bookResource_BookingConflict() {
         Long userId = 1L;
-        Booking booking = new Booking(1L, userId, 1L, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-        when(bookingRepository.findAll()).thenReturn(List.of(booking));
-
-        List<Booking> bookings = bookingService.getFilteredBookings(Optional.empty(), Optional.of(userId), Optional.empty());
-
-        assertThat(bookings).contains(booking);
-    }
-
-    @Test
-    @DisplayName("Should get filtered bookings by resource ID")
-    void shouldGetFilteredBookingsByResourceId() {
         Long resourceId = 1L;
-        Booking booking = new Booking(1L, 1L, resourceId, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-        when(bookingRepository.findAll()).thenReturn(List.of(booking));
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = startTime.plusHours(1);
 
-        List<Booking> bookings = bookingService.getFilteredBookings(Optional.empty(), Optional.empty(), Optional.of(resourceId));
+        when(workspaceRepository.findById(resourceId)).thenReturn(Optional.of(new Workspace()));
+        when(bookingRepository.findAll()).thenReturn(List.of(new Booking(1L, userId, resourceId, startTime, endTime)));
 
-        assertThat(bookings).contains(booking);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                bookingService.bookResource(userId, resourceId, startTime, endTime));
+        assertThat(exception.getMessage()).isEqualTo("Booking conflict detected");
     }
 
     @Test
-    @DisplayName("Should get user bookings")
-    void shouldGetUserBookings() {
+    @DisplayName("Should return all bookings")
+    void getAllBookings() {
+        List<Booking> bookings = List.of(new Booking(1L, 1L, 1L, LocalDateTime.now(), LocalDateTime.now().plusHours(1)));
+        when(bookingRepository.findAll()).thenReturn(bookings);
+
+        List<BookingDto> allBookings = bookingService.getAllBookings();
+
+        assertThat(allBookings).hasSize(1);
+        assertThat(allBookings.get(0).getUserId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Should return filtered bookings")
+    void getFilteredBookings() {
+        LocalDate date = LocalDate.now();
         Long userId = 1L;
-        User user = new User(userId, "username", "password");
-        Booking booking = new Booking(1L, userId, 1L, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-        when(bookingRepository.findAll()).thenReturn(List.of(booking));
+        Long resourceId = 1L;
+        List<Booking> bookings = List.of(new Booking(1L, userId, resourceId, date.atStartOfDay(), date.atTime(23, 59)));
+        when(bookingRepository.findAll()).thenReturn(bookings);
 
-        List<Booking> bookings = bookingService.getUserBookings(user);
+        List<BookingDto> filteredBookings = bookingService.getFilteredBookings(Optional.of(date), Optional.of(userId), Optional.of(resourceId));
 
-        assertThat(bookings).contains(booking);
+        assertThat(filteredBookings).hasSize(1);
+        assertThat(filteredBookings.get(0).getUserId()).isEqualTo(userId);
     }
 
     @Test
-    @DisplayName("Should cancel booking")
-    void shouldCancelBooking() {
+    @DisplayName("Should return user bookings")
+    void getUserBookings() {
+        Long userId = 1L;
+        List<Booking> bookings = List.of(new Booking(1L, userId, 1L, LocalDateTime.now(), LocalDateTime.now().plusHours(1)));
+        when(bookingRepository.findAll()).thenReturn(bookings);
+
+        UserDto userDto = new UserDto(userId, "testUser");
+        List<BookingDto> userBookings = bookingService.getUserBookings(userDto);
+
+        assertThat(userBookings).hasSize(1);
+        assertThat(userBookings.get(0).getUserId()).isEqualTo(userId);
+    }
+
+    @Test
+    @DisplayName("Should cancel booking successfully")
+    void cancelBooking() {
         Long bookingId = 1L;
-        Booking booking = new Booking(bookingId, 1L, 1L, LocalDateTime.now(), LocalDateTime.now().plusHours(1));
-        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(new Booking()));
 
-        bookingService.cancelBooking(new User(), bookingId);
+        UserDto userDto = new UserDto(1L, "admin");
+        bookingService.cancelBooking(userDto, bookingId);
 
-        Mockito.verify(bookingRepository).delete(bookingId);
+        verify(bookingRepository, times(1)).delete(bookingId);
     }
 
     @Test
-    @DisplayName("Should throw exception when canceling non-existent booking")
-    void shouldThrowExceptionWhenCancelingNonExistentBooking() {
+    @DisplayName("Should throw exception when booking not found")
+    void cancelBooking_BookingNotFound() {
         Long bookingId = 1L;
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> bookingService.cancelBooking(new User(), bookingId))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Booking not found.");
+        UserDto userDto = new UserDto(1L, "admin");
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                bookingService.cancelBooking(userDto, bookingId));
+        assertThat(exception.getMessage()).isEqualTo("Booking not found.");
     }
 }
-

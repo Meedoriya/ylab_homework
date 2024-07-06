@@ -2,8 +2,11 @@ package org.alibi.infrastructure;
 
 import org.alibi.domain.model.Booking;
 import org.alibi.domain.repository.BookingRepository;
-import org.alibi.in.DatabaseInitializer;
-import org.junit.jupiter.api.*;
+import org.alibi.config.DatabaseInitializer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;

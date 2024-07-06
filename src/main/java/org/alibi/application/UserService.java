@@ -3,6 +3,9 @@ package org.alibi.application;
 import lombok.RequiredArgsConstructor;
 import org.alibi.domain.model.User;
 import org.alibi.domain.repository.UserRepository;
+import org.alibi.dto.UserDto;
+import org.alibi.dto.UserRegistrationDto;
+import org.alibi.mapper.UserMapper;
 
 import java.util.Optional;
 
@@ -12,24 +15,22 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper = UserMapper.INSTANCE;
+
 
     /**
      * Регистрирует нового пользователя.
      *
-     * @param username Имя пользователя.
-     * @param password Пароль пользователя.
+     * @param userRegistrationDto Отвечает за имя и пароль пользователя.
      * @throws IllegalArgumentException если пользователь с таким именем уже существует.
      */
-    public void registerUser(String username, String password) {
-        Optional<User> existingUser = userRepository.findByUsername(username);
+    public void registerUser(UserRegistrationDto userRegistrationDto) {
+        Optional<User> existingUser = userRepository.findByUsername(userRegistrationDto.username());
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
 
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-
+        User user = userMapper.userRegistrationDtoToUser(userRegistrationDto);
         userRepository.save(user);
     }
 
@@ -41,12 +42,12 @@ public class UserService {
      * @return Авторизованный пользователь.
      * @throws IllegalArgumentException если имя пользователя или пароль неверны.
      */
-    public User loginUser(String username, String password) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent() && user.get().getPassword().equals(password)) {
-            return user.get();
-        } else {
-            throw new IllegalArgumentException("Invalid username or password");
-        }
+    public Optional<UserDto> loginUser(String username, String password) {
+        return userRepository.findByUsername(username)
+                .filter(user -> user.getPassword().equals(password))
+                .map(userMapper::toDto)
+                .map(Optional::of)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
     }
+
 }

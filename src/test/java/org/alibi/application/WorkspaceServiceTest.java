@@ -1,69 +1,104 @@
 package org.alibi.application;
 
-import org.alibi.domain.model.User;
 import org.alibi.domain.model.Workspace;
 import org.alibi.domain.repository.WorkspaceRepository;
+import org.alibi.dto.UserDto;
+import org.alibi.dto.WorkspaceDto;
+import org.alibi.mapper.WorkspaceMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class WorkspaceServiceTest {
 
     private WorkspaceRepository workspaceRepository;
     private WorkspaceService workspaceService;
-    private User mockUser;
+    private WorkspaceMapper workspaceMapper = WorkspaceMapper.INSTANCE;
 
     @BeforeEach
     void setUp() {
-        workspaceRepository = Mockito.mock(WorkspaceRepository.class);
+        workspaceRepository = mock(WorkspaceRepository.class);
         workspaceService = new WorkspaceService(workspaceRepository);
-        mockUser = new User(1L, "registeredUser", "password"); // Создаем тестового пользователя
     }
 
     @Test
-    @DisplayName("Should add workspace")
-    void shouldAddWorkspace() {
-        Workspace workspace = new Workspace(1L, "Workspace 1", true);
+    @DisplayName("Should add workspace successfully")
+    void addWorkspace() {
+        UserDto userDto = new UserDto(1L, "admin");
+        WorkspaceDto workspaceDto = new WorkspaceDto(1L, "Workspace 1", true);
 
-        workspaceService.addWorkspace(mockUser, workspace);
+        workspaceService.addWorkspace(userDto, workspaceDto);
 
-        Mockito.verify(workspaceRepository).save(workspace);
+        verify(workspaceRepository, times(1)).save(any(Workspace.class));
     }
 
     @Test
-    @DisplayName("Should update workspace")
-    void shouldUpdateWorkspace() {
-        Workspace workspace = new Workspace(1L, "Workspace 1", true);
+    @DisplayName("Should throw exception when adding workspace with non-registered user")
+    void addWorkspace_NotRegisteredUser() {
+        UserDto userDto = null;  // Non-registered user
+        WorkspaceDto workspaceDto = new WorkspaceDto(1L, "Workspace 1", true);
 
-        workspaceService.updateWorkspace(mockUser, workspace);
-
-        Mockito.verify(workspaceRepository).update(workspace);
+        assertThrows(SecurityException.class, () -> workspaceService.addWorkspace(userDto, workspaceDto));
     }
 
     @Test
-    @DisplayName("Should delete workspace")
-    void shouldDeleteWorkspace() {
+    @DisplayName("Should update workspace successfully")
+    void updateWorkspace() {
+        UserDto userDto = new UserDto(1L, "admin");
+        WorkspaceDto workspaceDto = new WorkspaceDto(1L, "Workspace 1", true);
+
+        workspaceService.updateWorkspace(userDto, workspaceDto);
+
+        verify(workspaceRepository, times(1)).update(any(Workspace.class));
+    }
+
+    @Test
+    @DisplayName("Should throw exception when updating workspace with non-registered user")
+    void updateWorkspace_NotRegisteredUser() {
+        UserDto userDto = null;  // Non-registered user
+        WorkspaceDto workspaceDto = new WorkspaceDto(1L, "Workspace 1", true);
+
+        assertThrows(SecurityException.class, () -> workspaceService.updateWorkspace(userDto, workspaceDto));
+    }
+
+    @Test
+    @DisplayName("Should delete workspace successfully")
+    void deleteWorkspace() {
+        UserDto userDto = new UserDto(1L, "admin");
         Long workspaceId = 1L;
 
-        workspaceService.deleteWorkspace(mockUser, workspaceId);
+        workspaceService.deleteWorkspace(userDto, workspaceId);
 
-        Mockito.verify(workspaceRepository).delete(workspaceId);
+        verify(workspaceRepository, times(1)).delete(workspaceId);
     }
 
     @Test
-    @DisplayName("Should get all workspaces")
-    void shouldGetAllWorkspaces() {
-        Workspace workspace = new Workspace(1L, "Workspace 1", true);
-        when(workspaceRepository.findAll()).thenReturn(List.of(workspace));
+    @DisplayName("Should throw exception when deleting workspace with non-registered user")
+    void deleteWorkspace_NotRegisteredUser() {
+        UserDto userDto = null;  // Non-registered user
+        Long workspaceId = 1L;
 
-        List<Workspace> workspaces = workspaceService.getAllWorkspaces();
+        assertThrows(SecurityException.class, () -> workspaceService.deleteWorkspace(userDto, workspaceId));
+    }
 
-        assertThat(workspaces).contains(workspace);
+    @Test
+    @DisplayName("Should get all workspaces successfully")
+    void getAllWorkspaces() {
+        List<Workspace> workspaces = List.of(new Workspace(1L, "Workspace 1", true));
+        when(workspaceRepository.findAll()).thenReturn(workspaces);
+
+        List<WorkspaceDto> workspaceDtos = workspaceService.getAllWorkspaces();
+
+        assertThat(workspaceDtos).hasSize(1);
+        assertThat(workspaceDtos.get(0).getName()).isEqualTo("Workspace 1");
     }
 }
+

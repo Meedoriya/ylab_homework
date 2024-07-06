@@ -2,7 +2,7 @@ package org.alibi.infrastructure;
 
 import org.alibi.domain.model.User;
 import org.alibi.domain.repository.UserRepository;
-import org.alibi.in.DatabaseInitializer;
+import org.alibi.config.DatabaseInitializer;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;

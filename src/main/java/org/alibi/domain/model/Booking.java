@@ -29,8 +29,7 @@ public class Booking {
     /**
      * Идентификатор ресурса (рабочего места или конференц-зала).
      */
-    Long resourceId; // id Workspace or ConferenceRoom
-
+    Long resourceId;
     /**
      * Время начала бронирования.
      */

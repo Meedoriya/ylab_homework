@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.alibi.domain.model.User;
 import org.alibi.domain.model.Workspace;
 import org.alibi.domain.repository.WorkspaceRepository;
+import org.alibi.dto.UserDto;
+import org.alibi.dto.WorkspaceDto;
+import org.alibi.mapper.WorkspaceMapper;
 
 import java.util.List;
 
@@ -14,16 +17,18 @@ import java.util.List;
 public class WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
+    private final WorkspaceMapper workspaceMapper = WorkspaceMapper.INSTANCE;
 
     /**
      * Добавляет новое рабочее место.
      *
-     * @param user     Пользователь, выполняющий операцию.
-     * @param workspace Рабочее место для добавления.
+     * @param userDto     Пользователь, выполняющий операцию.
+     * @param workspaceDto Рабочее место для добавления.
      * @throws SecurityException если пользователь не является зарегистрированным.
      */
-    public void addWorkspace(User user, Workspace workspace) {
-        if (isRegisteredUser(user)) {
+    public void addWorkspace(UserDto userDto, WorkspaceDto workspaceDto) {
+        if (isRegisteredUser(userDto)) {
+            Workspace workspace = workspaceMapper.toEntity(workspaceDto);
             workspaceRepository.save(workspace);
         } else {
             throw new SecurityException("Only registered users can add workspaces.");
@@ -34,17 +39,17 @@ public class WorkspaceService {
      * Обновляет существующее рабочее место.
      *
      * @param user     Пользователь, выполняющий операцию.
-     * @param workspace Рабочее место для обновления.
+     * @param workspaceDto Рабочее место для обновления.
      * @throws SecurityException если пользователь не является зарегистрированным.
      */
-    public void updateWorkspace(User user, Workspace workspace) {
-        if (isRegisteredUser(user)) {
+    public void updateWorkspace(UserDto userDto, WorkspaceDto workspaceDto) {
+        if (isRegisteredUser(userDto)) {
+            Workspace workspace = workspaceMapper.toEntity(workspaceDto);
             workspaceRepository.update(workspace);
         } else {
             throw new SecurityException("Only registered users can update workspaces.");
         }
     }
-
     /**
      * Удаляет рабочее место по его ID.
      *
@@ -52,8 +57,8 @@ public class WorkspaceService {
      * @param id       ID рабочего места для удаления.
      * @throws SecurityException если пользователь не является зарегистрированным.
      */
-    public void deleteWorkspace(User user, Long id) {
-        if (isRegisteredUser(user)) {
+    public void deleteWorkspace(UserDto userDto, Long id) {
+        if (isRegisteredUser(userDto)) {
             workspaceRepository.delete(id);
         } else {
             throw new SecurityException("Only registered users can delete workspaces.");
@@ -65,12 +70,14 @@ public class WorkspaceService {
      *
      * @return Список всех рабочих мест.
      */
-    public List<Workspace> getAllWorkspaces() {
-        return workspaceRepository.findAll();
+    public List<WorkspaceDto> getAllWorkspaces() {
+        return workspaceRepository.findAll().stream()
+                .map(workspaceMapper::toDto)
+                .toList();
     }
 
-    private boolean isRegisteredUser(User user) {
+    private boolean isRegisteredUser(UserDto userDto) {
         // Здесь можно добавить логику проверки, зарегистрирован ли пользователь
-        return user != null;
+        return userDto != null;
     }
 }

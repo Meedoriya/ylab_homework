@@ -8,6 +8,13 @@ import org.alibi.domain.model.Workspace;
 import org.alibi.domain.repository.BookingRepository;
 import org.alibi.domain.repository.ConferenceRoomRepository;
 import org.alibi.domain.repository.WorkspaceRepository;
+import org.alibi.dto.BookingDto;
+import org.alibi.dto.ConferenceRoomDto;
+import org.alibi.dto.UserDto;
+import org.alibi.dto.WorkspaceDto;
+import org.alibi.mapper.BookingMapper;
+import org.alibi.mapper.ConferenceRoomMapper;
+import org.alibi.mapper.WorkspaceMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +31,10 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ConferenceRoomRepository conferenceRoomRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final BookingMapper bookingMapper = BookingMapper.INSTANCE;
+    private final ConferenceRoomMapper conferenceRoomMapper = ConferenceRoomMapper.INSTANCE;
+    private final WorkspaceMapper workspaceMapper = WorkspaceMapper.INSTANCE;
+
 
     /**
      * Возвращает список доступных рабочих мест на указанную дату.
@@ -31,7 +42,7 @@ public class BookingService {
      * @param date Дата для проверки доступности.
      * @return Список доступных рабочих мест.
      */
-    public List<Workspace> getAvailableWorkspaces(LocalDate date) {
+    public List<WorkspaceDto> getAvailableWorkspaces(LocalDate date) {
         List<Long> bookedWorkspaceIds = bookingRepository.findAll().stream()
                 .filter(booking -> booking.getStartTime().toLocalDate().equals(date))
                 .map(Booking::getResourceId)
@@ -39,6 +50,7 @@ public class BookingService {
 
         return workspaceRepository.findAll().stream()
                 .filter(workspace -> !bookedWorkspaceIds.contains(workspace.getId()))
+                .map(workspaceMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -48,7 +60,7 @@ public class BookingService {
      * @param date Дата для проверки доступности.
      * @return Список доступных конференц-залов.
      */
-    public List<ConferenceRoom> getAvailableConferenceRooms(LocalDate date) {
+    public List<ConferenceRoomDto> getAvailableConferenceRooms(LocalDate date) {
         List<Long> bookedConferenceRooms = bookingRepository.findAll().stream()
                 .filter(booking -> booking.getStartTime().toLocalDate().equals(date))
                 .map(Booking::getResourceId)
@@ -56,6 +68,7 @@ public class BookingService {
 
         return conferenceRoomRepository.findAll().stream()
                 .filter(conferenceRoom -> !bookedConferenceRooms.contains(conferenceRoom.getId()))
+                .map(conferenceRoomMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -98,28 +111,36 @@ public class BookingService {
         bookingRepository.save(booking);
     }
 
+
     /**
      * Возвращает список всех бронирований.
      *
      * @return Список всех бронирований.
      */
-    public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
+    public List<BookingDto> getAllBookings() {
+        return bookingRepository.findAll().stream()
+                .map(bookingMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     /**
      * Возвращает отфильтрованный список бронирований по дате, ID пользователя или ID ресурса.
      *
-     * @param date      Опциональная дата для фильтрации.
-     * @param userId    Опциональный ID пользователя для фильтрации.
+     * @param date       Опциональная дата для фильтрации.
+     * @param userId     Опциональный ID пользователя для фильтрации.
      * @param resourceId Опциональный ID ресурса для фильтрации.
      * @return Отфильтрованный список бронирований.
      */
-    public List<Booking> getFilteredBookings(Optional<LocalDate> date, Optional<Long> userId, Optional<Long> resourceId) {
+    public List<BookingDto> getFilteredBookings(
+            Optional<LocalDate> date,
+            Optional<Long> userId,
+            Optional<Long> resourceId
+    ) {
         return bookingRepository.findAll().stream()
                 .filter(booking -> date.map(d -> booking.getStartTime().toLocalDate().equals(d)).orElse(true))
                 .filter(booking -> userId.map(id -> booking.getUserId().equals(id)).orElse(true))
                 .filter(booking -> resourceId.map(id -> booking.getResourceId().equals(id)).orElse(true))
+                .map(bookingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -129,9 +150,10 @@ public class BookingService {
      * @param user Пользователь, чьи бронирования нужно получить.
      * @return Список бронирований пользователя.
      */
-    public List<Booking> getUserBookings(User user) {
+    public List<BookingDto> getUserBookings(UserDto user) {
         return bookingRepository.findAll().stream()
                 .filter(booking -> booking.getUserId().equals(user.getId()))
+                .map(bookingMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -142,7 +164,7 @@ public class BookingService {
      * @param id   ID бронирования.
      * @throws IllegalArgumentException если бронирование не найдено.
      */
-    public void cancelBooking(User user, Long id) {
+    public void cancelBooking(UserDto user, Long id) {
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isPresent()) {
             bookingRepository.delete(id);

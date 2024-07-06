@@ -1,5 +1,4 @@
-package org.alibi.in;
-
+package org.alibi.config;
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.Database;
