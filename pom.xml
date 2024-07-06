@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://www.mvnrepository.com/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://www.mvnrepository.com/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.alibi</groupId>
   <artifactId>coworking-service</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>coworking-service</name>
   <url>http://maven.apache.org</url>
@@ -30,6 +30,7 @@
     <el.version>3.0.0</el.version>
     <datatype-jsr310.version>2.12.3</datatype-jsr310.version>
     <aspectj.version>1.9.7</aspectj.version>
+    <tomcat.version>9.0.60</tomcat.version>
   </properties>
 
   <dependencies>
@@ -166,7 +167,29 @@
       <version>${aspectj.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-core</artifactId>
+      <version>${tomcat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-jasper</artifactId>
+      <version>${tomcat.version}</version>
+    </dependency>
   </dependencies>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
 
   <build>
     <plugins>
@@ -212,7 +235,18 @@
           </aspectLibraries>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <url>http://localhost:8080/manager/text</url>
+          <server>TomcatServer</server>
+          <path>/coworking-service</path>
+          <username>admin</username>
+          <password>admin</password>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
-
