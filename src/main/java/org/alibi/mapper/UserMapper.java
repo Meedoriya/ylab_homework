@@ -1,18 +1,18 @@
 package org.alibi.mapper;
 
+import org.alibi.domain.dto.UserDto;
+import org.alibi.domain.dto.UserRegistrationDto;
 import org.alibi.domain.model.User;
-import org.alibi.dto.UserDto;
-import org.alibi.dto.UserRegistrationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
 /**
  * Mapper для преобразования между User и UserDto.
  */
-@Mapper
+@Mapper(componentModel = "spring")
+@Component
 public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     UserDto toDto(User user);
 

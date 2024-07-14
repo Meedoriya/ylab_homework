@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/postgres
+    username: alibi
+    password: alibi
+  liquibase:
+    change-log: classpath:db.changelog/changelog.xml
+    default-schema: coworking_service
+    liquibase-schema: liquibase
